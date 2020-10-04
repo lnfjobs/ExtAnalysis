@@ -21,7 +21,7 @@ import core.core as core
 import core.helper as helper
 import re
 
-def download(id, name=""):
+def download(id, name=""): #chrome
     ext_id = id
     if name == "":
         save_name = ext_id
@@ -29,9 +29,20 @@ def download(id, name=""):
         save_name = name
     save_path = helper.fixpath(core.lab_path + '/' + save_name + '.crx')
     core.updatelog("Downloader says: save_path is " + save_path)
-    # dl_url = "https://clients2.google.com/service/update2/crx?response=redirect&x=id%3D" + ext_id + "%26uc&prodversion=32"
-    # new download URL, issue #13
-    dl_url = "https://clients2.google.com/service/update2/crx?response=redirect&os=win&arch=x86-64&os_arch=x86-64&nacl_arch=x86-64&prod=chromecrx&prodchannel=unknown&prodversion=81.0.4044.138&acceptformat=crx2,crx3&x=id%3D" + ext_id + "%26uc"
+    if sys.platform == 'win32':
+    	os = 'windows'
+    	file = open(' ') #path or command to find where windows installed latest version is located (wmi or registry seems to be easiest)
+    	version = file.readline() #grabs the chrome version
+    	#dl_url = 'http://clients2.google.com/service/update2/crx?response=redirect&prodversion=' + version + '&acceptformat=crx2,crx3&x=id%3D' + ext_id + '%26uc'
+    elif sys.platform == 'darwin':
+    	os = 'osx'
+    	username = getpass.getuser() #this gets the current users username as it is in the system path on MAC
+    	file = open('/Users/' + username + '/Library/Application Support/Google/Chrome/Last Version', 'r') # combining the username into the macOS path so we can open the file.
+    	version = file.readline() # this grabs the version of chrome out of the local file
+    	dl_url = 'http://clients2.google.com/service/update2/crx?response=redirect&prodversion=' + version + '&acceptformat=crx2,crx3&x=id%3D' + ext_id + '%26uc'
+    elif sys.platform == 'linux' or sys.platform == 'linux2':
+    	os = 'linux'
+    	dl_url = ''#need to craft linux url specific to finding the latest version of chrome
     print("Download URL: " + dl_url)
 
     try:
